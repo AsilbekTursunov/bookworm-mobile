@@ -3,20 +3,29 @@ import React, { useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import { useUserStore } from '@/store/userStore'
 import { Ionicons } from '@expo/vector-icons'
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { router } from 'expo-router'
+import moment from 'moment'
 const ProfileScreen = () => {
-  const { user } = useUserStore()
-  const [loading, setLoading] = useState(false)
+  const { user, setUserData } = useUserStore()
+  const [loading, setLoading] = useState(false) 
 
-  const handleLogout = async () => { }
+  const handleLogout = async () => {
+    setLoading(true)
+    await AsyncStorage.removeItem('token')
+    setUserData(null)
+    setLoading(false)
+    router.push('/(auth)/sign-in')
+  }
+  if (!user) return <ActivityIndicator size={'large'} />
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
-        <Image source={{ uri: 'https://api.dicebear.com/9.x/avataaars/png?seed=jamshid' }} resizeMode='contain' style={styles.profileImage} />
+        <Image source={{ uri: user.image || 'https://api.dicebear.com/9.x/avataaars/png?seed=jamshid' }} resizeMode='contain' style={styles.profileImage} />
         <View style={styles.profileInfo}>
           <Text style={styles.username}>{user.username}</Text>
           <Text style={styles.email}>{user.email}</Text>
-          <Text style={styles.memberSince}>{user.createdAt ? '' : ''}</Text>
+          <Text style={styles.memberSince}>{moment(user.createdAt).format('LL')}</Text>
         </View>
       </View>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

@@ -1,0 +1,1 @@
+export const PUBLIC_API = 'https://bookworm-backend-hxtv.onrender.com/api'

@@ -3,11 +3,12 @@ import React, { useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import InputField from '@/components/InputField';
 import { Link, router } from 'expo-router';
-import AsyncStorage  from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useUserStore } from '@/store/userStore';
+import { PUBLIC_API } from '@/constants';
 const SignUpScreen = () => {
   const [loading, setLoading] = useState(false)
-  const [email, setEmail] = useState<string>('') 
+  const [email, setEmail] = useState<string>('')
   const { setUserData } = useUserStore()
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -15,7 +16,7 @@ const SignUpScreen = () => {
   const handleSignUp = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://192.168.0.106:8081/api/register', {
+      const response = await fetch(`${PUBLIC_API}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,8 +30,7 @@ const SignUpScreen = () => {
       }
 
       const data = await response.json();
-      await AsyncStorage.setItem('token', data.token)
-      console.log('register token', data.token)
+      await AsyncStorage.setItem('token', data.token) 
       setUserData(data.user); // UserStorega o’rnatish
       router.push('/(tabs)/home')
     } catch (error: any) {
@@ -60,6 +60,7 @@ const SignUpScreen = () => {
                 placeholder='Enter your username'
                 icon={'person-outline'}
                 iconSize={20}
+                keyboardType='default'
               />
               <Text>&nbsp;</Text>
               <InputField
@@ -68,6 +69,7 @@ const SignUpScreen = () => {
                 onChangeText={setEmail}
                 placeholder='Enter your email'
                 icon={'mail-outline'}
+                keyboardType='email-address'
                 iconSize={20}
               />
               <Text>&nbsp;</Text>
@@ -77,7 +79,9 @@ const SignUpScreen = () => {
                 onChangeText={setPassword}
                 placeholder='Enter your password'
                 icon={'key-outline'}
-                iconSize={20}
+                keyboardType='visible-password'
+                iconSize={20} 
+                password={true}
               />
             </View>
             <TouchableOpacity style={styles.button} onPress={handleSignUp}>

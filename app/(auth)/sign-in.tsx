@@ -1,20 +1,49 @@
-import { View, Text, StyleSheet, Dimensions, Image, StatusBar, ImageProps, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, Dimensions, Image, StatusBar, ImageProps, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import icons from '@/constants/icons';
 import { Ionicons } from '@expo/vector-icons'
 import InputField from '@/components/InputField';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PUBLIC_API } from '@/constants';
+import { useUserStore } from '@/store/userStore';
 const { width } = Dimensions.get("window");
 
 const SignInScreen = () => {
   const [loading, setLoading] = useState(false)
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+  const { setUserData } = useUserStore()
 
   const handleSignIn = async () => { 
-   }
+    setLoading(true);
+    try {
+      const response = await fetch(`${PUBLIC_API}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json(); // Serverdan xatolik ma’lumotini olish
+        throw new Error(errorData.message || 'Failed during register');
+      }
+
+      const data = await response.json();
+      await AsyncStorage.setItem('token', data.token)
+      setUserData(data.user); // UserStorega o’rnatish
+      router.push('/(tabs)/home')
+    } catch (error: any) {
+      Alert.alert('Registration error', `${error.message}`); // Foydalanuvchiga xatolikni ko‘rsatish
+    } finally {
+      setLoading(false);
+      setEmail('');
+      setPassword('');
+    }
+  }
   return (
     <>
       <View style={styles.container}>
@@ -42,15 +71,16 @@ const SignInScreen = () => {
                 placeholder='Enter your password'
                 icon={'key-outline'}
                 iconSize={20}
+                password={true}
               />
             </View>
             <TouchableOpacity style={styles.button} onPress={handleSignIn}>
               {loading ? <>
-                <ActivityIndicator size={'large'} color={'#fff'}/>
+                <ActivityIndicator size={'large'} color={'#fff'} />
               </> : <>
                 <Text style={styles.buttonText}>Login</Text>
               </>}
-            </TouchableOpacity> 
+            </TouchableOpacity>
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>Don't have an account?</Text>

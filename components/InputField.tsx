@@ -12,10 +12,11 @@ interface Input extends TextInputProps {
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters',
   props?: TextInputProps,
   height?: number,
-  textAlignVertical?: 'auto' | 'center' | 'top' | 'bottom'
+  textAlignVertical?: 'auto' | 'center' | 'top' | 'bottom',
+  password?: boolean
 }
 
-const InputField = ({ label, icon, value, onChangeText, props, iconSize, placeholder, height = 48, textAlignVertical = 'center' }: Input) => {
+const InputField = ({ label, icon, value, onChangeText, props, iconSize, placeholder, height = 48, textAlignVertical = 'center', password }: Input) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -39,10 +40,9 @@ const InputField = ({ label, icon, value, onChangeText, props, iconSize, placeho
               }, props?.style]}
               placeholder={placeholder}
               value={value}
-              onChangeText={onChangeText}
-              keyboardType='default'
-              autoCapitalize='words' 
+              onChangeText={onChangeText} 
               {...props}
+              secureTextEntry={password}
               placeholderTextColor={COLORS.placeholderText}
             />
           </View>
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 48, 
+    height: 48,
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',

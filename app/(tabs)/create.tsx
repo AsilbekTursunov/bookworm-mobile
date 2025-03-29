@@ -1,9 +1,12 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import InputField from '@/components/InputField'
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
+import { useUserStore } from '@/store/userStore'
+import { PUBLIC_API } from '@/constants'
+import { router } from 'expo-router'
 
 const CreateScreen = () => {
   const [title, setTitle] = useState<string>('')
@@ -12,14 +15,13 @@ const CreateScreen = () => {
   const [loading, setLoading] = useState(false)
   const [image64, setImage64] = useState<string>('')
   const [description, setDescription] = useState<string>('')
-
+  const { user } = useUserStore()
 
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: 'images',
       allowsEditing: true,
-      aspect: [4, 4],
       quality: 1,
       base64: true,
     });
@@ -27,6 +29,39 @@ const CreateScreen = () => {
     if (!result.canceled) {
       setImage(result.assets[0].uri)
       setImage64(`data:${result.assets[0].mimeType};base64,` + result.assets[0].base64)
+    }
+  }
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    console.log({ title, rate, image: image64, caption: description, userId: user?.id });
+
+    try {
+      const response = await fetch(`${PUBLIC_API}/books/create-book`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title, rate, image: image64, caption: description, userId: user?.id }),
+      })
+      console.log(response);
+
+      // if (response.ok) {
+      //   Alert.alert('Success', 'Book recommendation added successfully!')
+      //   setTitle('')
+      //   setRate(1)
+      //   setImage('')
+      //   setImage64('')
+      //   setDescription('')
+      //   setLoading(false)
+      //   router.push('/(tabs)/home')
+      // } else {
+      //   throw new Error('Failed to add book recommendation')
+      // }
+    } catch (error) {
+      console.error(error)
+      alert('Failed to create book recommendation')
+      setLoading(false)
     }
   }
   return (
@@ -64,32 +99,45 @@ const CreateScreen = () => {
               </View>
               <Text>&nbsp;</Text>
               <Text style={styles.label}>Book Image</Text>
-              <View style={styles.imagePicker}>
+              <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
                 {image ?
                   <>
                     <Image src={image} style={styles.previewImage} />
                   </>
                   :
-                  <TouchableOpacity style={styles.openImagePicker} onPress={pickImage}>
+                  <View style={styles.openImagePicker} >
                     <Ionicons size={30} name='image' color='#688f68' />
                     <Text style={styles.placeholderText}>Tab select image</Text>
-                  </TouchableOpacity>
+                  </View>
                 }
-              </View>
+              </TouchableOpacity>
               <Text>&nbsp;</Text>
               <View>
                 <Text style={styles.label}>Caption</Text>
-                <TextInput 
+                <TextInput
                   style={styles.textArea}
                   value={description}
                   onChangeText={setDescription}
-                  placeholder='Write your review or thoughts about this book...' 
-                  multiline 
+                  placeholder='Write your review or thoughts about this book...'
+                  multiline
                   textAlignVertical='top'
                 />
               </View>
             </View>
           </View>
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            {loading ?
+              <>
+                <ActivityIndicator color='#fff' size={'large'} />
+              </>
+              :
+              <>
+                <Ionicons name='cloud-upload-outline' color='#fff' size={20} />
+                <Text style={styles.buttonText}>
+                  Post Recommendation
+                </Text>
+              </>}
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -103,6 +151,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: COLORS.background,
     padding: 10,
+    marginBottom: 50
   },
   scrollViewStyle: {
     flex: 1,
@@ -112,7 +161,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
     padding: 20,
-    marginTop: 50,
+    marginTop: 40,
     marginHorizontal: 3,
     marginVertical: 16,
     shadowColor: COLORS.black,
@@ -137,7 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
     textAlign: "center",
-  }, 
+  },
   label: {
     fontSize: 14,
     marginBottom: 8,
@@ -222,10 +271,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderRadius: 12,
     height: 50,
+    display: 'flex',
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginTop: 16,
+    gap: 10,
     shadowColor: COLORS.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -235,7 +286,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "400",
   },
   buttonIcon: {
     marginRight: 8,

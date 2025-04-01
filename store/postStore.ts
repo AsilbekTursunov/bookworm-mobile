@@ -23,3 +23,13 @@ export const useDataStore = create<IDataStore>((set) => ({
   data: null,
   setData: (data) => set({ data }),
 }))
+
+interface IUserDataStore {
+  setPosts: (data: IData[]) => void,
+  posts: IData[] | null,
+}
+
+export const userPostDataStore = create<IUserDataStore>((set) => ({
+  posts: null,
+  setPosts: (data) => set({ posts: data }),
+}))

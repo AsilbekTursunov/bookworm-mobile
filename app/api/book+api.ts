@@ -7,7 +7,7 @@ export async function POST(req: Request) {
     console.log({ title, rate, image, caption, userId })
     // await connectDB()
     // Save book to database here...
-    const response = await fetch('http://localhost:8000/api/books/book', {
+    const response = await fetch('http://localhost:8000/api/books/create-book', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({ title, rate, image, caption, userId }),
     }) 
     // const response = (await Book.create({ title, rate, image, caption, user: userId })).populate('user')
-    // console.log('api response', response)
+    console.log('api response', response)
 
     return new Response(JSON.stringify(response), { status: 201 })
 

@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, Image } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { IData } from '@/store/postStore'
 import { COLORS } from '@/constants/colors'
 import { Ionicons } from '@expo/vector-icons'
 import moment from 'moment'
 
 const HomeCard = ({ book }: { book: IData }) => {
+  const [more, setMore] = useState(false)
   return (
     <View style={styles.bookCard}>
       <View style={styles.userInfo}>
@@ -19,7 +20,7 @@ const HomeCard = ({ book }: { book: IData }) => {
         <Text style={styles.bookTitle}>{book.title}</Text>
         <View style={styles.ratingContainer}>
           {Array.from({ length: 5 }).map((_, index) => {
-            return (
+            return ( 
               <Ionicons
                 name={index + 1 <= Number(book.rate) ? 'star' : 'star-outline'}
                 color={index + 1 <= Number(book.rate) ? '#ecc207' : '#070707'}
@@ -28,7 +29,7 @@ const HomeCard = ({ book }: { book: IData }) => {
             )
           })}
         </View>
-        <Text style={styles.caption}>{book.caption}</Text>
+        <Text style={styles.caption}>{book.caption.length > 100 ? book.caption.slice(0, 100) : book.caption}</Text>
         <Text style={styles.date}>{moment(book.createdAt).format('LL')}</Text>
       </View>
     </View>
@@ -42,12 +43,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
     marginBottom: 20,
-    padding: 16,
-    shadowColor: COLORS.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    padding: 16, 
     borderWidth: 1,
     borderColor: COLORS.border,
   },
@@ -75,7 +71,7 @@ const styles = StyleSheet.create({
   },
   bookImageContainer: {
     width: "100%",
-    height: 200,
+    height: 250,
     borderRadius: 12,
     marginTop: 10,
     overflow: "hidden",

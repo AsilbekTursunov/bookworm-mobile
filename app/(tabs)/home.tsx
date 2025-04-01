@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image, RefreshControl } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, Image, RefreshControl, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Loader from '@/components/Loader'
 import { PUBLIC_API } from '@/constants'
@@ -12,17 +12,20 @@ import { FlatList } from 'react-native'
 const HomeScreen = () => {
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState<number>(5)
+  const [page, setPage] = useState<number>(1)
   const { data, setData } = useDataStore()
   const [refreshing, setRefreshing] = useState(false)
 
   const getData = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${PUBLIC_API}/books/all?page=1&limit=${limit}`)
+      const response = await fetch(`${PUBLIC_API}/books/all?page=${page}&limit=${limit}`)
 
       if (response.ok) {
         const { data } = await response.json()
+
         setData(data);
+        setLimit(limit + 1); // 📌 Limitni 5 taga oshirish
       }
       setLoading(false)
     } catch (error) {
@@ -33,29 +36,37 @@ const HomeScreen = () => {
     setRefreshing(true)
     await getData()
     setRefreshing(false)
+    setLimit(5)
+    setPage(1)
   }
-  useEffect(() => {
-    getData()
-  }, [limit])
+  console.log(`${PUBLIC_API}/books/all?page=${page}&limit=${limit}`);
 
   return (
     <View style={styles.container}>
-      {loading || refreshing ? (
-        <View style={styles.loadingContainer}>
-          <Loader />
-        </View>
-      ) : (
-        <>
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>BookWorm🐛</Text>
-            <Text style={styles.headerSubtitle}>Share your favourite reads</Text>
+
+      <>
+        {loading || refreshing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0ff373" />
           </View>
+        ) : (
+            <ScrollView>
+              <View style={styles.header}>
+                <Text style={styles.headerTitle}>BookWorm🐛</Text>
+                <Text style={styles.headerSubtitle}>Share your favourite reads</Text>
+              </View>
+          </ScrollView>
+        )}
+        {data && (
           <FlatList
             data={data}
+            showsVerticalScrollIndicator={false}
             style={styles.listContainer}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-            renderItem={({ item }) => <HomeCard key={item.id} book={item} />}
-            keyExtractor={item => item.id}
+            renderItem={({ item }) => <HomeCard book={item} />}
+            onEndReached={getData} // 📌 Pastga tushganda yangi data olish  
+            ListFooterComponent={loading || refreshing ? <ActivityIndicator size="large" color="#0ff373" /> : null} // 📌 Loader ko‘rsatish
+            keyExtractor={(item, index) => item.id?.toString() || index.toString()} // Fallback key
             ListEmptyComponent={
               <View style={styles.notFound}>
                 <Ionicons
@@ -68,8 +79,8 @@ const HomeScreen = () => {
               </View>
             }
           />
-        </>
-      )}
+        )}
+      </>
     </View>
   )
 }

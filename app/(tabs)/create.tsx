@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator, Alert } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator, Alert, RefreshControl } from 'react-native'
 import React, { useState } from 'react'
 import { COLORS } from '@/constants/colors'
 import InputField from '@/components/InputField'
@@ -15,8 +15,18 @@ const CreateScreen = () => {
   const [loading, setLoading] = useState(false)
   const [image64, setImage64] = useState<string>('')
   const [description, setDescription] = useState<string>('')
+  const [refreshing, setRefreshing] = useState(false)
+
   const { user } = useUserStore()
 
+  const handleRefresh = async () => {
+    setTitle('')
+    setRate(1)
+    setImage('')
+    setImage64('')
+    setDescription('')
+    setLoading(false)
+  }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -34,7 +44,15 @@ const CreateScreen = () => {
 
   const handleSubmit = async () => {
     setLoading(true)
-    console.log({ title, rate, image: image64, caption: description, userId: user?.id });
+    const bookData = {
+      title,
+      rate: rate.toString(),
+      image: image64,
+      caption: description,
+      email: user?.email
+    };
+
+    console.log('Submitting book data:', JSON.stringify(bookData));
 
     try {
       const response = await fetch(`${PUBLIC_API}/books/create-book`, {
@@ -42,31 +60,30 @@ const CreateScreen = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ title, rate, image: image64, caption: description, userId: user?.id }),
-      })
-      console.log(response);
+        body: JSON.stringify(bookData),
+      });
 
-      // if (response.ok) {
-      //   Alert.alert('Success', 'Book recommendation added successfully!')
-      //   setTitle('')
-      //   setRate(1)
-      //   setImage('')
-      //   setImage64('')
-      //   setDescription('')
-      //   setLoading(false)
-      //   router.push('/(tabs)/home')
-      // } else {
-      //   throw new Error('Failed to add book recommendation')
-      // }
-    } catch (error) {
-      console.error(error)
-      alert('Failed to create book recommendation')
-      setLoading(false)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      Alert.alert('Success', 'Book recommendation created successfully!', [{ onPress: () => router.push('/(tabs)/home') }]);
+      // Optionally reset form fields here
+      handleRefresh()
+    } catch (error: any) {
+      console.error('Error creating book:', error);
+      alert(`Failed to create book recommendation: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   }
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollViewStyle}>
+      <ScrollView
+        style={styles.scrollViewStyle}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+      >
         <View style={styles.card}>
           <View style={styles.header}>
             <Text style={styles.title}>Add Book Recommendation</Text>
@@ -102,7 +119,7 @@ const CreateScreen = () => {
               <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
                 {image ?
                   <>
-                    <Image src={image} style={styles.previewImage} />
+                    <Image src={image} style={styles.previewImage} resizeMode='contain' />
                   </>
                   :
                   <View style={styles.openImagePicker} >
@@ -239,7 +256,7 @@ const styles = StyleSheet.create({
   imagePicker: {
     width: "100%",
     height: 200,
-    backgroundColor: COLORS.inputBackground,
+    backgroundColor: '#fdfdfd',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.border,

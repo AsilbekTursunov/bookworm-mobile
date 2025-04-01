@@ -30,23 +30,14 @@ export default function TabLayout() {
         tabBarShowLabel: false,
         tabBarStyle: {
           height: 60,
-          flexDirection: "row",
           position: "absolute",
-          borderRadius: 25,
+          borderRadius: 15,
           marginHorizontal: 10,
-          paddingTop: 8,
-          marginVertical: 10,
-          shadowColor: '#c4c4c4',
-          borderWidth: 0,
-          borderColor: '#94998c',
+          paddingTop: 10,
+          marginVertical: 4,
+          overflow: 'hidden',
+          borderTopWidth: 0,
           backgroundColor: '#22291e',
-          shadowOffset: {
-            width: 2,
-            height: 2,
-          },
-          shadowOpacity: 0.58,
-          shadowRadius: 16.0,
-          elevation: 10,
         },
       }}>
       <Tabs.Screen
@@ -84,3 +75,16 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   }
 })
+
+//** 
+// tabBarStyle: {
+//   height: 50, 
+//   position: "absolute",
+//   borderRadius: 15,
+//   marginHorizontal: 10,
+//   paddingTop: 4,
+//   marginVertical: 4,
+//   borderWidth: 0, 
+//   backgroundColor: '#22291e',  
+// },
+// */

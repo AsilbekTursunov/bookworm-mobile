@@ -38,48 +38,37 @@ const HomeScreen = () => {
     setRefreshing(false)
     setLimit(5)
     setPage(1)
-  }
-  console.log(`${PUBLIC_API}/books/all?page=${page}&limit=${limit}`);
+  } 
 
   return (
     <View style={styles.container}>
 
       <>
-        {loading || refreshing ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#0ff373" />
-          </View>
-        ) : (
-            <ScrollView>
-              <View style={styles.header}>
-                <Text style={styles.headerTitle}>BookWorm🐛</Text>
-                <Text style={styles.headerSubtitle}>Share your favourite reads</Text>
-              </View>
-          </ScrollView>
-        )}
-        {data && (
-          <FlatList
-            data={data}
-            showsVerticalScrollIndicator={false}
-            style={styles.listContainer}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-            renderItem={({ item }) => <HomeCard book={item} />}
-            onEndReached={getData} // 📌 Pastga tushganda yangi data olish  
-            ListFooterComponent={loading || refreshing ? <ActivityIndicator size="large" color="#0ff373" /> : null} // 📌 Loader ko‘rsatish
-            keyExtractor={(item, index) => item.id?.toString() || index.toString()} // Fallback key
-            ListEmptyComponent={
-              <View style={styles.notFound}>
-                <Ionicons
-                  name="book-outline"
-                  size={120}
-                  style={{ marginBottom: 40 }}
-                  color={'#677534'}
-                />
-                <Text style={styles.notFoundText}>No books found.</Text>
-              </View>
-            }
-          />
-        )}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>BookWorm🐛</Text>
+          <Text style={styles.headerSubtitle}>Share your favourite reads</Text>
+        </View>
+        <FlatList
+          data={data}
+          showsVerticalScrollIndicator={false}
+          style={styles.listContainer}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+          renderItem={({ item }) => <HomeCard book={item} />}
+          onEndReached={getData} // 📌 Pastga tushganda yangi data olish  
+          ListFooterComponent={loading || refreshing ? <ActivityIndicator size="large" color="#0ff373" /> : null} // 📌 Loader ko‘rsatish
+          keyExtractor={(item, index) => item.id?.toString() || index.toString()} // Fallback key
+          ListEmptyComponent={
+            <View style={styles.notFound}>
+              <Ionicons
+                name="book-outline"
+                size={120}
+                style={{ marginBottom: 40 }}
+                color={'#677534'}
+              />
+              <Text style={styles.notFoundText}>No books found.</Text>
+            </View>
+          }
+        />
       </>
     </View>
   )

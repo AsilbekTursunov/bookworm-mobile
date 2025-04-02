@@ -52,7 +52,6 @@ const CreateScreen = () => {
       email: user?.email
     };
 
-    console.log('Submitting book data:', JSON.stringify(bookData));
 
     try {
       const response = await fetch(`${PUBLIC_API}/books/create-book`, {

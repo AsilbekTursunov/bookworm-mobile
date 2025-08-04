@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, StatusBar, TouchableOpacity, ActivityIndicator, Alert } from 'react-native'
 import React, { useState } from 'react'
-import { COLORS } from '@/constants/colors'
+import { COLORS } from '@/constants/Colors'
 import InputField from '@/components/InputField';
 import { Link, router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage'

@@ -1,7 +1,7 @@
 import { View, Text, TextInputProps, TextInput, StyleSheet, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import React from 'react'
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '@/constants/colors';
+import { COLORS } from '@/constants/Colors'
 interface Input extends TextInputProps {
   label?: string;
   icon?: any

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Dimensions, Image, StatusBar, ImageProps, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native'
 import React, { useState } from 'react'
-import { COLORS } from '@/constants/colors'
+import { COLORS } from '@/constants/Colors'
 import icons from '@/constants/icons';
 import { Ionicons } from '@expo/vector-icons'
 import InputField from '@/components/InputField';
@@ -37,8 +37,8 @@ const SignInScreen = () => {
       setUserData(data.user); // UserStorega o’rnatish
       router.push('/(tabs)/home')
     } catch (error: any) {
-      Alert.alert('Registration error', `${error.message}`); // Foydalanuvchiga xatolikni ko‘rsatish
-    } finally {
+			Alert.alert('Registration error', `${error}`) // Foydalanuvchiga xatolikni ko‘rsatish
+		} finally {
       setLoading(false);
       setEmail('');
       setPassword('');

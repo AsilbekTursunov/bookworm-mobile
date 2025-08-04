@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { IData, userPostDataStore } from '@/store/postStore'
-import { COLORS } from '@/constants/colors'
+import { COLORS } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
 import moment from 'moment'
 import { PUBLIC_API } from '@/constants'
